@@ -10,7 +10,8 @@
     padding: 20px;
     background: #fff;
     border-radius: 5px;
-    width: 50%;
+    width: 60%;
+    height: 60%;
     position: relative;
     transition: all 0.3s ease-in-out;
 }
@@ -31,8 +32,9 @@
 }
 
 .popup .content {
-  max-height: 30%;
   overflow: auto;
+  width: 100%;
+  height: calc(100% - 65px);
 }
 
 .overlay {
@@ -52,14 +54,49 @@
   opacity: 1;
 }
 
-.get-markdown.pure-button
+.get-markdown.pure-button,
+.copy-clipboard.pure-button
 {
-    background-color: rgb(64, 201, 96); /* this is a green */
+    background-color: rgb(64, 221, 96); /* this is a green */
     transition: all 0.3s ease-out;
+}
+
+.copy-status
+{
+    transition: opacity 0.3s;
+    visibility: hidden;
+    opacity: 0;
+}
+
+.copy-status.shown
+{
+    visibility: visible;
+    opacity: 1;
+}
+
+.popup-control-box
+{
+    display: inline-block;
 }
 
 #editor
 {
     border: 1px solid;
     padding: 20px;
+    min-height: 200px;
 }
+
+/* Hides extra elements and expands content width for print mode */
+@media print {
+    #toolbar {
+        display: none;
+    }
+    body {
+        width: 94%;
+        padding-top: 1em;
+        font-size: 12px;
+    }
+    html {
+        border-top: 0;
+    }
+  }

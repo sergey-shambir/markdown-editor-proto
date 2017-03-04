@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-
+<html lang="en-US">
 <head>
 	<meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Editor</title>
+	<title>Markdown Editor</title>
 	<link rel="stylesheet" href="js/pen/pen.css">
 	<link rel="stylesheet" href="css/pure/pure.css">
 	<link rel="stylesheet" href="css/editor.css">
+    <link rel="stylesheet" href="css/font-awesome.css">
 	<script src="js/showdown/showdown.js"></script>
 	<script src="js/pen/markdown.js"></script>
 	<script src="js/pen/pen.js"></script>
@@ -25,9 +26,21 @@
         <div id="editor"></div>
         <div class="markdown overlay">
             <div class="popup">
-                <h2>Your Markdown Code</h2>
+                <div class="pure-g">
+                    <div class="pure-u-1">
+                        <div class="popup-control-box">
+                            <h3>Your Markdown Code</h3>
+                        </div>
+                        <div class="popup-control-box">
+                            <button class="copy-clipboard pure-button">
+                                Copy!
+                                <i class="copy-status fa fa-check-circle-o" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 <a class="popup-close" href="#">&times;</a>
-                <pre class="content"></pre>
+                <textarea class="content"></textarea>
             </div>
         </div>
     </div>
