@@ -1,0 +1,65 @@
+.container
+{
+    width: 70%;
+    margin: 0 auto;
+}
+
+.popup
+{
+    margin: 70px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 5px;
+    width: 50%;
+    position: relative;
+    transition: all 0.3s ease-in-out;
+}
+
+.popup .popup-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  transition: all 0.3s;
+  font-size: 30px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+}
+
+.popup .popup-close:hover {
+  color: #06D85F;
+}
+
+.popup .content {
+  max-height: 30%;
+  overflow: auto;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  transition: opacity 0.3s;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.overlay-on {
+  visibility: visible;
+  opacity: 1;
+}
+
+.get-markdown.pure-button
+{
+    background-color: rgb(64, 201, 96); /* this is a green */
+    transition: all 0.3s ease-out;
+}
+
+#editor
+{
+    border: 1px solid;
+    padding: 20px;
+}
