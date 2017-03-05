@@ -11,6 +11,207 @@ el.addEventListener ("paste", function(e) {
     console.log(html);
 }, false);*/
 
+function convertHtmlToMarkdown(editorDiv)
+{
+    let markdown = '';
+    let state = {
+        isInsideCode: false,
+        marker: ' ',
+        markerNo: 0,
+        listLevel: 0,
+        listIndent: '',
+        href: '',
+    }
+    let states = []
+    function pushState() {
+        let newState = Object.assign({}, state);
+        states.push(state);
+        state = newState;
+    }
+    function popState() {
+        state = states.pop();
+    }
+
+    let actionCode = {
+        beforeEnter: () => {
+            if (!state.isInsideCode)
+                markdown += '`';
+        },
+        afterEnter: () => {
+            state.isInsideCode = true;
+        },
+        afterExit: () => {
+            if (!state.isInsideCode)
+                markdown += '`';
+        },
+    };
+    let actionPre = {
+        beforeEnter: () => {
+            if (!state.isInsideCode)
+                markdown += '\n```\n';
+        },
+        afterEnter: () => {
+            state.isInsideCode = true;
+        },
+        afterExit: () => {
+            if (!state.isInsideCode)
+                markdown += '```\n';
+        },
+    };
+    let actionParagraph = {
+        afterExit: () => {
+            if (!state.isInsideCode)
+                markdown += '\n';
+        }
+    };
+    let actionText = {
+        afterEnter: (node) => {
+            let text = node.wholeText;
+            if (!state.isInsideCode) {
+                text = text.replace(/\n+/g, '');
+            }
+            markdown += text;
+        }
+    };
+    let actionUnorderedList = {
+        afterEnter: () => {
+            markdown += '\n';
+            state.marker = '*';
+            state.listIndent = ' '.repeat(4 * state.listLevel);
+            state.listLevel += 1;
+        },
+        afterExit: () => {
+            markdown += '\n';
+        },
+    };
+    let actionOrderedList = {
+        afterEnter: () => {
+            markdown += '\n';
+            state.marker = '1.';
+            state.markerNo = 1;
+            state.listIndent = ' '.repeat(4 * state.listLevel);
+            state.listLevel += 1;
+        },
+        afterChild: () => {
+            state.markerNo += 1;
+            state.marker = state.markerNo.toString() + '.';
+        },
+        afterExit: () => {
+            markdown += '\n';
+        },
+    };
+    let actionListItem = {
+        afterEnter: () => {
+            markdown += state.listIndent + state.marker + " ";
+        },
+        afterExit: () => {
+            markdown += '\n';
+        }
+    };
+    let actionLink = {
+        afterEnter: (node) => {
+            state.href = node.attributes.getNamedItem("href").value;
+            markdown += '[';
+        },
+        beforeExit: (node) => {
+            markdown += '](' + state.href + ')';
+        },
+    };
+    let actionImg = {
+        afterEnter: (node) => {
+            let src = node.attributes.getNamedItem("src").value;
+            let alt = node.attributes.getNamedItem("alt").value;
+            let parser = document.createElement('a');
+            parser.href = src;
+            src = parser.pathname + parser.search + parser.hash;
+
+            markdown += '![' + alt + '](' + src + ')';
+        },
+    };
+    function makeHeaderAction(level) {
+        return {
+            beforeEnter: () => {
+                markdown += '\n' + '#'.repeat(level) + ' ';
+            },
+            afterExit: () => {
+                markdown += '\n';
+            }
+        }
+    }
+
+    function selectAction(node) {
+        switch (node.nodeType)
+        {
+        case Node.TEXT_NODE:
+            return actionText;
+        case Node.ELEMENT_NODE:
+            switch (node.tagName) {
+                case 'CODE':
+                    return actionCode;
+                case 'PRE':
+                    return actionPre;
+                case 'P':
+                    return actionParagraph;
+                case 'UL':
+                    return actionUnorderedList;
+                case 'OL':
+                    return actionOrderedList;
+                case 'LI':
+                    return actionListItem;
+                case 'A':
+                    return actionLink;
+                case 'IMG':
+                    return actionImg;
+                case 'H1':
+                    return makeHeaderAction(1);
+                case 'H2':
+                    return makeHeaderAction(2);
+                case 'H3':
+                    return makeHeaderAction(3);
+                case 'H4':
+                    return makeHeaderAction(4);
+                case 'H5':
+                    return makeHeaderAction(5);
+                case 'H6':
+                    return makeHeaderAction(6);
+                default:
+                    console.log("unhandled tag:", node.tagName);
+                    break;
+            }
+            break;
+        }
+        return null;
+    }
+
+    function visit(node) {
+        let action = selectAction(node)
+        if (action) {
+            if (action.beforeEnter)
+                action.beforeEnter(node);
+            pushState();
+            if (action.afterEnter)
+                action.afterEnter(node);
+        }
+
+        for (let child of node.childNodes) {
+            visit(child);
+            if (action && action.afterChild)
+                action.afterChild(node);
+        }
+
+        if (action) {
+            if (action.beforeExit)
+                action.beforeExit(node);
+            popState();
+            if (action.afterExit)
+                action.afterExit(node);
+        }
+    }
+    visit(editorDiv);
+
+    return markdown;
+}
+
 function MarkdownEditor()
 {
     let editorDiv = document.getElementById('editor');
@@ -35,7 +236,7 @@ function MarkdownEditor()
     this.markdownShown = false;
 
     this.showMarkdownCode = function() {
-        markdownText.value = this.editor.toMd();
+        markdownText.value = convertHtmlToMarkdown(editorDiv);
         copyStatusSpan.classList.remove('shown');
         overlayDiv.classList.add('overlay-on');
         this.editor.destroy();
