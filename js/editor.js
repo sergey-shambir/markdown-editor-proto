@@ -64,6 +64,14 @@ function convertHtmlToMarkdown(editorDiv)
                 markdown += '\n';
         }
     };
+    let actionBlockquote = {
+        afterEnter: () => {
+            markdown += '>';
+        },
+        afterExit: () => {
+            markdown += '\n';
+        }
+    };
     let actionText = {
         afterEnter: (node) => {
             let text = node.wholeText;
@@ -117,6 +125,22 @@ function convertHtmlToMarkdown(editorDiv)
             markdown += '](' + state.href + ')';
         },
     };
+    let actionBold = {
+        afterEnter: () => {
+            markdown += '**';
+        },
+        beforeExit: () => {
+            markdown += '**';
+        }
+    };
+    let actionItalic = {
+        afterEnter: () => {
+            markdown += '***';
+        },
+        beforeExit: () => {
+            markdown += '***';
+        }
+    };
     let actionImg = {
         afterEnter: (node) => {
             let src = node.attributes.getNamedItem("src").value;
@@ -126,6 +150,11 @@ function convertHtmlToMarkdown(editorDiv)
             src = parser.pathname + parser.search + parser.hash;
 
             markdown += '![' + alt + '](' + src + ')';
+        },
+    };
+    let actionHorizontalLine = {
+        afterEnter: () => {
+            markdown += '\n---\n';
         },
     };
     function makeHeaderAction(level) {
@@ -152,6 +181,8 @@ function convertHtmlToMarkdown(editorDiv)
                     return actionPre;
                 case 'P':
                     return actionParagraph;
+                case 'BLOCKQUOTE':
+                    return actionBlockquote;
                 case 'UL':
                     return actionUnorderedList;
                 case 'OL':
@@ -162,6 +193,10 @@ function convertHtmlToMarkdown(editorDiv)
                     return actionLink;
                 case 'IMG':
                     return actionImg;
+                case 'B':
+                    return actionBold;
+                case 'I':
+                    return actionItalic;
                 case 'H1':
                     return makeHeaderAction(1);
                 case 'H2':
@@ -174,6 +209,8 @@ function convertHtmlToMarkdown(editorDiv)
                     return makeHeaderAction(5);
                 case 'H6':
                     return makeHeaderAction(6);
+                case 'HR':
+                    return actionHorizontalLine;
                 default:
                     console.log("unhandled tag:", node.tagName);
                     break;
