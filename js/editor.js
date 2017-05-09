@@ -55,7 +55,7 @@ function convertHtmlToMarkdown(editorDiv)
         },
         afterExit: () => {
             if (!state.isInsideCode)
-                markdown += '```\n';
+                markdown += '```\n\n';
         },
     };
     let actionParagraph = {
@@ -76,7 +76,7 @@ function convertHtmlToMarkdown(editorDiv)
         afterEnter: (node) => {
             let text = node.wholeText;
             if (!state.isInsideCode) {
-                text = text.replace(/\n+/g, '');
+                text = text.replace(/\n+/g, ' ');
             }
             markdown += text;
         }
