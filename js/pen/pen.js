@@ -1064,7 +1064,7 @@
       node.childNodes.forEach(function (child) {
         self._visit(child);
         if (action && action.afterChild)
-          action.afterChil.call(self, node);
+          action.afterChild.call(self, node);
       });
 
       if (action) {
