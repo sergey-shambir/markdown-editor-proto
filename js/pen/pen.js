@@ -933,7 +933,7 @@
 
     PenHtmlToMarkdown.prototype.actionListItem = {
       afterEnter: function () {
-        this._markdown += this._state.listIndent + this._state.marker + " ";
+        this._markdown += this._state.listIndent + this._state.marker + ' ';
       },
       afterExit: function () {
         this._markdown += '\n';
@@ -942,7 +942,8 @@
     
     PenHtmlToMarkdown.prototype.actionLink = {
       afterEnter: function (node) {
-        this._state.href = node.attributes.getNamedItem("href").value;
+        const hrefNode = node.attributes.getNamedItem('href')
+        this._state.href = (hrefNode ? hrefNode.value : '#');
         this._markdown += '[';
       },
       beforeExit: function () {
@@ -970,13 +971,15 @@
 
     PenHtmlToMarkdown.prototype.actionImg = {
       afterEnter: function (node) {
-        var src = node.attributes.getNamedItem("src").value;
-        var alt = node.attributes.getNamedItem("alt").value;
-        var parser = document.createElement('a');
+        const srcNode = node.attributes.getNamedItem('src');
+        const altNode = node.attributes.getNamedItem('alt');
+        const src = srcNode ? srcNode.value : '#';
+        const alt = altNode ? altNode.value : '';
+        const parser = document.createElement('a');
         parser.href = src;
-        src = parser.pathname + parser.search + parser.hash;
+        const cleanSrc = parser.pathname + parser.search + parser.hash;
 
-        this._markdown += '![' + alt + '](' + src + ')';
+        this._markdown += '![' + alt + '](' + cleanSrc + ')';
       },
     };
     
